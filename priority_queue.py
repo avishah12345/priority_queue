@@ -1,8 +1,21 @@
+from typing import Callable
+
+
 class PriorityQueue:
     def __init__(self):
         self._queue = list()
 
-    def insert(self, priority: int, target, args: tuple = None, kwargs: dict = None):
+    def __repr__(self):
+        self._queue.sort()
+
+        def mapper(item):
+            priority, target, args, kwargs = item
+            return f"\n\t({priority=}, {target=}, {args=}, {kwargs=})"
+
+        t = ','.join(map(mapper, self._queue))
+        return f"PriorityQueue(queue=[{t}\n])"
+
+    def insert(self, priority: int, target: Callable, args: tuple = None, kwargs: dict = None):
         """
         :param priority: Lower the value, higher the priority
         :param target: Callable
@@ -43,6 +56,10 @@ class PriorityQueue:
         self._queue.clear()
 
     def clear(self):
+        """
+        Clears queue
+        :return: None
+        """
         self._queue.clear()
 
 
@@ -54,10 +71,11 @@ if __name__ == '__main__':
     t1 = time.perf_counter()
 
     queue = PriorityQueue()
-    queue.insert(2, print, ("Low priority",), kwargs={'end': ' kwargs\n'})
+    queue.insert(2, print, ("Low priority",), {'end': ' kwargs\n'}),
     queue.insert(1, print, ("Medium Priority",))
     queue.run()  # till now, medium priority has highest priority, executes firsts
     queue.insert(0, print, ("High priority",))
+    print(queue)
     queue.run(3)  # now high and low priority are present in queue, higher one executes first
 
     t2 = time.perf_counter()
