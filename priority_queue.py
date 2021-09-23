@@ -14,9 +14,9 @@ class PriorityQueue:
 
     def run(self, count: int = 1, priority: bool = False):
         """
-        :param count: Runs first {count} functions
+        :param count: Runs first {count} functions, ordered by priority, then by FIFO
         :param priority: If true, runs all functions with the same and highest priority. Overrides count
-        :return:
+        :return: None
         """
         self._queue.sort()  # sorting only by first item should be faster, but for some reason isn't
         if priority:
@@ -32,11 +32,26 @@ class PriorityQueue:
             except IndexError: return
             else: target(*args, **kwargs)
 
+    def run_all(self):
+        """
+        Runs all targets in queue, sorted by priority
+        :return: None
+        """
+        self._queue.sort()
+        for __, target, args, kwargs in self._queue:
+            target(*args, **kwargs)
+        self._queue.clear()
+
+    def clear(self):
+        self._queue.clear()
+
 
 if __name__ == '__main__':
-    import time
+    import time, psutil, os
+    process = psutil.Process(os.getpid())
+    print(f"Memory: {process.memory_info().rss / (1024 * 1024)} MB\n")
 
-    start = time.perf_counter()
+    t1 = time.perf_counter()
 
     queue = PriorityQueue()
     queue.insert(2, print, ("Low priority",), kwargs={'end': ' kwargs\n'})
@@ -44,6 +59,8 @@ if __name__ == '__main__':
     queue.run()  # till now, medium priority has highest priority, executes firsts
     queue.insert(0, print, ("High priority",))
     queue.run(3)  # now high and low priority are present in queue, higher one executes first
+
+    t2 = time.perf_counter()
 
     queue.insert(2, print, ("Low priority",))
     queue.insert(1, print, ("\nMedium Priority 2",))
@@ -53,4 +70,16 @@ if __name__ == '__main__':
     queue.run(priority=True)
     queue.run(priority=True)
 
-    print(f"{(time.perf_counter() - start) * 1000000} ns")
+    t3 = time.perf_counter()
+
+    queue.insert(1, print, ("Medium Priority",))
+    queue.insert(0, print, ("\nHigh priority",))
+    queue.run_all()
+
+    t4 = time.perf_counter()
+
+    print(f"""\nCount run: {(t2 - t1) * 1000000} ns
+Priority run: {(t3 - t2) * 1000000} ns
+All run: {(t4 - t3) * 1000000} ns
+Total: {(t4 - t1) * 1000000} ns""")
+    print(f"Memory: {process.memory_info().rss / (1024 * 1024)} MB")
