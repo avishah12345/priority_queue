@@ -12,8 +12,8 @@ class PriorityQueue:
             priority, target, args, kwargs = item
             return f"\n\t({priority=}, {target=}, {args=}, {kwargs=})"
 
-        t = ','.join(map(mapper, self._queue))
-        return f"PriorityQueue(queue=[{t}\n])"
+        t = ','.join(map(mapper, self._queue)) + '\n' if self._queue else ''
+        return f"PriorityQueue(queue=[{t}])"
 
     def insert(self, priority: int, target: Callable, args: tuple = None, kwargs: dict = None):
         """
@@ -71,6 +71,7 @@ if __name__ == '__main__':
     t1 = time.perf_counter()
 
     queue = PriorityQueue()
+    print(queue)
     queue.insert(2, print, ("Low priority",), {'end': ' kwargs\n'}),
     queue.insert(1, print, ("Medium Priority",))
     queue.run()  # till now, medium priority has highest priority, executes firsts
