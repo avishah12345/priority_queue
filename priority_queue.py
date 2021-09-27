@@ -108,8 +108,8 @@ if __name__ == '__main__':
 
     # Create empty function for testing speed
     def nothing(*args, **kwargs):
-        print(*args, **kwargs)
-        # pass
+        # print(*args, **kwargs)
+        pass
 
 
     def get_time():
